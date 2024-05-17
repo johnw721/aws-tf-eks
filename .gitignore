@@ -1,1 +1,2 @@
-.terraform
+# Ignore the .terraform folder
+.terraform/
