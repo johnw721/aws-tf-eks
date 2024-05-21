@@ -1,0 +1,3 @@
+Ensure IAM Roles and Policies: Make sure the EKS nodes have the necessary IAM roles and policies to interact with EBS volumes and other AWS services.
+Credentials Management: Use AWS Secrets Manager or SSM Parameter Store to securely manage sensitive data such as database credentials.
+Terraform State Management: Use Terraform's state management features and remote backends to manage the state file securely and efficiently.
