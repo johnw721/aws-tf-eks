@@ -110,14 +110,23 @@ resource "aws_subnet" "main" {
   }
 }
 
+# Monitoring Solutions
 
-# Create VPC Flow Log
+## Create VPC Flow Log
 resource "aws_flow_log" "example" {
   iam_role_arn    = aws_iam_role.example.arn
   log_destination = aws_cloudwatch_log_group.example.arn
   traffic_type    = "ALL"
   vpc_id          = aws_vpc.example.id
 }
+
+## Install Splunk on a relevant components
+
+
+## Set up CloudWatch Dashboard to watch 
+
+
+## Make sure everything has a tag for resource tracking
 
  # Create an EKS cluster in the private subnet
 
@@ -154,8 +163,7 @@ resource "aws_ebs_volume" "ebs_v1" {
     size              = 10
     type              = "gp3"
     encrypted         = true
-    kms_key_id        = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234
-    -1234-1234-123456789012"
+    kms_key_id        = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
     count = 2
     tags = {
         Name = "ebs_v1"
@@ -222,67 +230,6 @@ autoscaling_scale_out_cooldown = 400
     Environment = "dev"
     Terraform   = "true"
   }
-}
-
-    # Create Internal Load Balancer
-
-resource "aws_lb" "test" {
-  name               = "test-lb-tf"
-  internal           = true
-  load_balancer_type = "network"
-  subnets            = [for subnet in aws_subnet.private : subnet.id]
-
-  enable_deletion_protection = true
-
-  tags = {
-    Environment = "production"
-  }
-}
-
-resource "aws_lb_target_group" "tg" {
-  name     = "target-group"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
-}
-
-resource "aws_lb_listener" "listener" {
-  load_balancer_arn = aws_lb.internal.arn
-  port              = 80
-  protocol          = "HTTP"
-  
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.tg.arn
-  }
-}
-
-resource "aws_lb_target_group_attachment" "example" {
-  count = 2
-  target_group_arn = aws_lb_target_group.tg.arn
-  target_id        = module.eks.node_groups["eks_nodes"].instances[count.index].id
-  port             = 80
-}
-
-# Route Table
-resource "aws_route_table" "private" {
-    vpc_id = aws_vpc.main.id
-    tags = {
-        Name = "private-route-table"
-        }
-        route {
-            cidr_block = "0.0.0.0/0"
-            gateway_id = aws_nat_gateway.nat.id
-        }
-}
-
-# Route Table Association
-
-resource "aws_route_table_association" "private" {
-    subnet_id = aws_subnet.private.id
-    route_table_id = aws_route_table.private.id
-    count =1
-
 }
 
 # Create separate environment for testing
