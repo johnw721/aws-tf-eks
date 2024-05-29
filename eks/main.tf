@@ -50,15 +50,27 @@ module "public_subnets" {
   subnet_count            = 3
   availability_zones      = data.aws_availability_zones.azs
   tags = {
-    
+
   }
 }
 
+# Elastic IP Address
+
+resource "aws_eip" "eip_for_nat_gateway" {
+  domain   = "vpc"
+}
+
+resource "aws_eip" "secondary" {
+  domain   = "vpc"
+}
+
 # NAT Gateway in Public Subnet
+# Further info:
+# - https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html
 
 resource "aws_nat_gateway" "example" {
-  allocation_id                  = aws_eip.example.id
-  subnet_id                      = aws_subnet.example.id
+  allocation_id                  = aws_eip.eip_for_nat_gateway.id # Assign a Elastic IP Address
+  subnet_id                      = aws_subnet.public_subnets.id
   secondary_allocation_ids       = [aws_eip.secondary.id]
   secondary_private_ip_addresses = ["10.0.1.5"]
 }
@@ -102,25 +114,15 @@ module "security-group" {
   }
 }
 
-# Subnets
-
-resource "aws_subnet" "main" {
-  vpc_id     = aws_vpc.main.id
-  cidr_block = var.public_subnets[0]
-
-  tags = {
-    Name = "Main"
-  }
-}
 
 # Monitoring Solutions
 
 ## Create VPC Flow Log
-resource "aws_flow_log" "example" {
+resource "aws_flow_log" "flow_log_for_splunk" {
   iam_role_arn    = aws_iam_role.example.arn
   log_destination = aws_cloudwatch_log_group.example.arn
   traffic_type    = "ALL"
-  vpc_id          = aws_vpc.example.id
+  vpc_id          = module.vpc.id
 }
 
 ## Install Splunk on a relevant components
@@ -237,4 +239,3 @@ autoscaling_scale_out_cooldown = 400
 
 # Create separate environment for testing
 
-# 
