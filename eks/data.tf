@@ -20,7 +20,7 @@ data "aws_ami" "jenkins_ami" {
 # How do you want this machine to be virtualized
   filter {
     name   = "virtualization-type"
-    values = ["hvm"]
+    values = ["hvm"] // [image-comments/Paravirtualization Visualized.png]
   }
 }
 

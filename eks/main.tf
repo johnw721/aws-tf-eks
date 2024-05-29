@@ -176,7 +176,7 @@ resource "aws_ebs_volume" "ebs_v1" {
     
 }
 
-# Attach EBS Volume
+# Attach EBS Volume to EKS Cluster
 
 resource "aws_volume_attachment" "ebs_v_attachment" {
     count = 2
@@ -214,7 +214,7 @@ autoscaling_scale_out_cooldown = 400
 
 
 
-  vpc_id               = "vpc-12345678"
+  vpc_id               = module.vpc.id
   db_subnet_group_name = "db-subnet-group"
   security_group_rules = {
     ex1_ingress = {
