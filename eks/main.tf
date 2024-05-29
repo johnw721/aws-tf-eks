@@ -49,6 +49,9 @@ module "public_subnets" {
   cidr_block              = var.public_subnets[0]
   subnet_count            = 3
   availability_zones      = data.aws_availability_zones.azs
+  tags = {
+    
+  }
 }
 
 # NAT Gateway in Public Subnet
