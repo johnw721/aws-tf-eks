@@ -5,19 +5,19 @@ data "aws_ami" "jenkins_ami" {
   most_recent = true
   owners      = ["amazon"]
 
-# Filter the data down to machines with this specific ami
+  # Filter the data down to machines with this specific ami
   filter {
     name   = "aws_ami"
     values = ["amzn2-ami-kernel-5.10-hvm-2.0.20240412.0-x86_64-gp3"]
   }
 
-# How durable do you want the storage to be
+  # How durable do you want the storage to be
   filter {
     name   = "root-device-type"
     values = ["ebs"] # Data persist through reboots
   }
 
-# How do you want this machine to be virtualized
+  # How do you want this machine to be virtualized
   filter {
     name   = "virtualization-type"
     values = ["hvm"] // [image-comments/Paravirtualization Visualized.png]
