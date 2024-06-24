@@ -216,10 +216,10 @@ module "eks" {
 # Attach EBS Volume to EKS Cluster
 #
 #resource "aws_volume_attachment" "ebs_v_attachment" {
- # count       = 2
- # device_name = "/dev/sdh"
-  #volume_id   = aws_ebs_volume.ebs_v1.id
-  #instance_id = module.eks.cluster_arn
+# count       = 2
+# device_name = "/dev/sdh"
+#volume_id   = aws_ebs_volume.ebs_v1.id
+#instance_id = module.eks.cluster_arn
 #}
 
 
@@ -305,8 +305,8 @@ resource "aws_iam_role" "example" {
         Principal = {
           Service = [
             "ec2.amazonaws.com",
-            "logs.amazonaws.com",  # Added for CloudWatch Logs
-            "vpc-flow-logs.amazonaws.com"  # Added for VPC Flow Logs
+            "logs.amazonaws.com",         # Added for CloudWatch Logs
+            "vpc-flow-logs.amazonaws.com" # Added for VPC Flow Logs
           ]
         }
       }
