@@ -7,7 +7,7 @@ terraform {
     bucket = "grey.terraform.aws.jenkins.pipeline"
 
     # Where to store the pipeline configuration data in S3
-    key = "jenkins/terraform.tfstate"
+    key = "eks/.terraform/terraform.tfstate"
 
     # AWS region where everything will be deployed
     region = "us-east-1"

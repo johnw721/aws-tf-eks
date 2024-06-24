@@ -8,8 +8,8 @@ module "vpc" {
   cidr = var.vpc_cidr
 
   azs             = data.aws_availability_zones.azs.names
-  private_subnets = module.private_subnets
-  public_subnets  = module.public_subnets
+  private_subnets = var.private_subnets
+  public_subnets  = var.public_subnets
 
   enable_dns_hostnames = true
 
@@ -23,34 +23,34 @@ module "vpc" {
 
 # Private Subnet
 
-module "private_subnets" {
-  source  = "claranet/vpc-modules/aws//modules/private-subnets"
-  version = "0.4.0"
+# module "private_subnets" {
+#   source  = "claranet/vpc-modules/aws//modules/private-subnets"
+#   version = "0.4.0"
 
-  count                   = 2
-  vpc_id                  = module.vpc.default_vpc_id
-  cidr_block              = var.private_subnets[0]
-  subnet_count            = 3
-  availability_zones      = data.aws_availability_zones.azs
+#   count                   = 2
+#   vpc_id                  = module.vpc.default_vpc_id
+#   cidr_block              = var.private_subnets[0]
+#   subnet_count            = 3
+#   availability_zones      = data.aws_availability_zones.azs
 
-}
+# }
 
-# Public Subnet
+# # Public Subnet
 
-module "public_subnets" {
-  source  = "claranet/vpc-modules/aws//modules/public-subnets"
-  version = "0.4.0"
+# module "public_subnets" {
+#   source  = "claranet/vpc-modules/aws//modules/public-subnets"
+#   version = "0.4.0"
 
-  vpc_id                  = module.vpc.default_vpc_id
-  gateway_id              = module.vpc.igw_id
-  map_public_ip_on_launch = true
-  cidr_block              = var.public_subnets[0]
-  subnet_count            = 3
-  availability_zones      = data.aws_availability_zones.azs
-  tags = {
+#   vpc_id                  = module.vpc.default_vpc_id
+#   gateway_id              = module.vpc.igw_id
+#   map_public_ip_on_launch = true
+#   cidr_block              = var.public_subnets[0]
+#   subnet_count            = 3
+#   availability_zones      = data.aws_availability_zones.azs
+#   tags = {
 
-  }
-}
+#   }
+# }
 
 
 # Monitoring Solutions
@@ -78,7 +78,7 @@ module "eks" {
   cluster_endpoint_public_access = true
 
   vpc_id     = module.vpc.default_vpc_id
-  subnet_ids = module.vpc.private_subnets
+  subnet_ids = module.vpc.public_subnets_
 
   eks_managed_node_groups = {
     nodes = {
