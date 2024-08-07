@@ -250,8 +250,7 @@ module "cluster" {
 
 
 
-
-  vpc_id               = module.vpc.default_vpc_id
+  vpc_id = module.vpc.vpc_id
   db_subnet_group_name = "db-subnet-group"
   security_group_rules = {
     ex1_ingress = {
@@ -345,4 +344,3 @@ resource "aws_flow_log" "flow_log_for_splunk" {
   traffic_type    = "ALL"
   vpc_id          = module.vpc.vpc_id
 }
-
