@@ -78,7 +78,7 @@ module "eks" {
   cluster_endpoint_public_access = true
 
   vpc_id     = module.vpc.default_vpc_id
-  subnet_ids = module.vpc.public_subnets_
+  subnet_ids = module.vpc.public_subnets
 
   eks_managed_node_groups = {
     nodes = {
@@ -334,15 +334,15 @@ resource "aws_iam_role_policy" "cloudwatch_logs_policy" {
 }
 
 ## Create CloudWatch Log Group named Example
-resource "aws_cloudwatch_log_group" "example" {
-  name = "example"
-}
+#resource "aws_cloudwatch_log_group" "example" {
+ # name = "aws"
+#}
 
 ## Create VPC Flow Log
-resource "aws_flow_log" "flow_log_for_splunk" {
-  iam_role_arn    = aws_iam_role.example.arn
-  log_destination = aws_cloudwatch_log_group.example.arn
-  traffic_type    = "ALL"
-  vpc_id          = module.vpc.default_vpc_id
-}
+# resource "aws_flow_log" "flow_log_for_splunk" {
+#   iam_role_arn    = aws_iam_role.example.arn
+#   log_destination = aws_cloudwatch_log_group.example.arn
+#   traffic_type    = "ALL"
+#   vpc_id          = module.vpc.vpc_id
+# }
 
