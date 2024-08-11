@@ -7,17 +7,58 @@ module "vpc" {
   name = "my-vpc"
   cidr = var.vpc_cidr
 
+  # Availability Zone and Subnets setup
   azs             = data.aws_availability_zones.azs.names
   private_subnets = var.private_subnets
   public_subnets  = var.public_subnets
 
+  # Enable DNS hostnames for instances within the VPC (necessary for public access via hostname)
   enable_dns_hostnames = true
-
 
   tags = {
     Terraform   = "true"
     name        = "aws-terraform-jenkins-eks example"
     Environment = "dev"
+  }
+}
+
+
+# Security Group (firewall) for Jenkins cluster
+
+module "sg" {
+  source = "terraform-aws-modules/security-group/aws"
+
+  name        = "jenkins-sg"
+  description = "Security Group for Jenkins"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress_cidr_blocks = [
+    {
+      from_port   = 8080
+      to_port     = 8080
+      protocol    = "tcp"
+      description = "HTTPS"
+      cidr_blocks = "0.0.0.0/0"
+    },
+    {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      description = "SSH"
+      cidr_blocks = "0.0.0.0/0"
+    }
+  ]
+
+  egress_cidr_blocks = [
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = "0.0.0.0/0"
+    }
+  ]
+  tags = {
+    Name = "jenkins-sg"
   }
 }
 
@@ -96,7 +137,28 @@ module "eks" {
   }
 }
 
+# EC2
 
+module "ec2_instance" {
+
+  source = "terraform-aws-modules/ec2-instance/aws"
+  name   = "Jenkins-Server"
+
+  instance_type               = var.instance_type
+  key_name                    = "jenkins-server-key"
+  monitoring                  = true
+  vpc_security_group_ids      = [module.sg.source_security_group_id]
+  subnet_id                   = module.vpc.public_subnets[0]
+  associate_public_ip_address = true
+  user_data                   = file("jenkins-install.sh")
+  availability_zone           = data.aws_availability_zones.azs.names[0]
+
+  tags = {
+    Name        = "jenkins-server"
+    Terraform   = true
+    Environment = "dev"
+  }
+}
 
 #Create EBS Volumes 
 # resource "aws_ebs_volume" "ebs_v1" {
@@ -248,9 +310,6 @@ module "cluster" {
 
   autoscaling_scale_out_cooldown = 400
 
-
-
-
   vpc_id               = module.vpc.default_vpc_id
   db_subnet_group_name = "db-subnet-group"
   security_group_rules = {
@@ -335,7 +394,7 @@ resource "aws_iam_role_policy" "cloudwatch_logs_policy" {
 
 ## Create CloudWatch Log Group named Example
 #resource "aws_cloudwatch_log_group" "example" {
- # name = "aws"
+# name = "aws"
 #}
 
 ## Create VPC Flow Log
