@@ -32,7 +32,7 @@ module "sg" {
   description = "Security Group for Jenkins"
   vpc_id      = module.vpc.vpc_id
 
-  ingress_cidr_blocks = [
+  ingress_with_cidr_blocks = [
     {
       from_port   = 8080
       to_port     = 8080
@@ -49,7 +49,7 @@ module "sg" {
     }
   ]
 
-  egress_cidr_blocks = [
+  egress_with_cidr_blocks = [
     {
       from_port   = 0
       to_port     = 0
@@ -147,10 +147,10 @@ module "ec2_instance" {
   instance_type               = var.instance_type
   key_name                    = "jenkins-server-key"
   monitoring                  = true
-  vpc_security_group_ids      = [module.sg.source_security_group_id]
+  vpc_security_group_ids      = [module.sg.security_group_id]
   subnet_id                   = module.vpc.public_subnets[0]
   associate_public_ip_address = true
-  user_data                   = file("jenkins-install.sh")
+  user_data                   = file("jenkins-installation.sh")
   availability_zone           = data.aws_availability_zones.azs.names[0]
 
   tags = {
